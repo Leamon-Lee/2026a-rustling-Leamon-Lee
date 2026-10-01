@@ -12,7 +12,13 @@ from course import COURSE, ROOT, record, run, write_result
 
 def validate_catalog():
     exercises = tomllib.loads((ROOT / "info.toml").read_text())["exercises"]
-    actual = [{key: item[key] for key in ("name", "path", "mode")} for item in exercises]
+    # Rustlings keeps intro1 as a completion gate, but the course rubric starts
+    # at intro2 and contains 110 scored exercises.
+    actual = [
+        {key: item[key] for key in ("name", "path", "mode")}
+        for item in exercises
+        if item["name"] != "intro1"
+    ]
     expected = [{key: item[key] for key in ("name", "path", "mode")} for item in COURSE["tests"]]
     if actual != expected:
         raise ValueError("Exercise catalog differs from the course rubric; no score was produced.")
